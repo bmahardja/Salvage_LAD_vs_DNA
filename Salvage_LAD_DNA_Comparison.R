@@ -4,10 +4,10 @@ library(lubridate)
 library(splitstackshape)
 library(data.table)
 
-data <- readRDS(file = "Salvage_DNA_vs_LAD.rds") %>% mutate(Wateryear=ifelse(month(SampleTime)>9,year(SampleTime)+1,year(SampleTime))) %>%
-  #There are no genetic winter-run left unpaired in 2015, 2017, 2018, 2019, and 2021 
+data <- readRDS(file = file.path("output/Salvage_DNA_vs_LAD.rds")) %>% mutate(Wateryear=ifelse(month(SampleTime)>9,year(SampleTime)+1,year(SampleTime))) %>%
+  #There are no genetic winter-run left unpaired in 2015, 2017, 2018, 2019, 2020, and 2021 
   #Remove 2021 for now, since there's a single winter-run not assigned sample time by Scott
-  filter(Wateryear %in% c("2015","2017","2018","2019"))
+  filter(Wateryear %in% c("2015","2017","2018","2019","2020","2021"))
 
 str(data)
 
@@ -31,11 +31,11 @@ winter_run_data$Winter_Run_Genetic_Loss[is.na(winter_run_data$Winter_Run_Genetic
 
 
 #Annual summary
-winter_run_data_annual <- winter_run_data %>% group_by(Wateryear) %>% summarise(Winter_Run_LAD_Expanded_Salvage=sum(Winter_Run_LAD_Expanded_Salvage),
+winter_run_data_annual <- winter_run_data %>% group_by(Facility,Wateryear) %>% summarise(Winter_Run_LAD_Expanded_Salvage=sum(Winter_Run_LAD_Expanded_Salvage),
                                                                                 Winter_Run_LAD_Loss=sum(Winter_Run_LAD_Loss),
                                                                                 Winter_Run_Genetic_Expanded_Salvage=sum(Winter_Run_Genetic_Expanded_Salvage),
                                                                                 Winter_Run_Genetic_Loss=sum(Winter_Run_Genetic_Loss))
 
 #Print as csv
-write.csv(winter_run_data,file="Winter_Run_LAD_vs_Genetic_comparison_daily_2022-02-23.csv",row.names = F)
-write.csv(winter_run_data_annual,file="Winter_Run_LAD_vs_Genetic_comparison_annual_2022-02-23.csv",row.names = F)
+write.csv(winter_run_data,file=file.path("output/Winter_Run_LAD_vs_Genetic_comparison_daily_2022-02-24.csv"),row.names = F)
+write.csv(winter_run_data_annual,file=file.path("output/Winter_Run_LAD_vs_Genetic_comparison_annual_2022-02-24.csv"),row.names = F)
