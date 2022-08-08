@@ -6,7 +6,6 @@ library(data.table)
 
 data <- readRDS(file = file.path("output/Salvage_DNA_vs_LAD.rds")) %>% mutate(Wateryear=ifelse(month(SampleTime)>9,year(SampleTime)+1,year(SampleTime))) %>%
   #There are no genetic winter-run left unpaired in 2015, 2017, 2018, 2019, 2020, and 2021 
-  #Remove 2021 for now, since there's a single winter-run not assigned sample time by Scott
   filter(Wateryear %in% c("2015","2017","2018","2019","2020","2021"))
 
 str(data)
