@@ -131,6 +131,8 @@ genetic_data_combined<- genetic_data_combined %>% filter(WaterYear<2019)
 
 genetic_data_combined<-bind_rows(genetic_data_combined,genetic_data_qaqc_2019_2021)
 
+# Save combined dataset to a file
+saveRDS(genetic_data_combined, file = file.path("output/post2010_DNA_data_unchecked.rds"))
 
 
 ##################### Combine the salvage and genetic data sets
