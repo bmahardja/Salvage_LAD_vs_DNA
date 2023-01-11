@@ -13,6 +13,9 @@ salvage_data$SampleDateTime<-as.POSIXct(paste(salvage_data$Date, salvage_data$Ti
 #Keep data with non-existent date and time
 salvage_data_wrong_time <- salvage_data %>% filter(is.na(SampleDateTime))
 
+#Change date to the proper format, ignore date and time for now
+salvage_data$SampleDate<-as.Date(salvage_data$SampleDate, format = "%m/%d/%y")
+
 ########## Prep salvage data
 str(salvage_data)
 #Rename columns to make it easier to work in R and divide Loss + Expanded Salvage by nfish
@@ -20,24 +23,12 @@ salvage_data_adjusted<- salvage_data %>%
   dplyr::mutate(Facility =case_when(Facility==1 ~ "SWP",
                                     Facility==2 ~ "CVP")) %>%
 
-  #Remove erroneous sample date and time
-  filter(!is.na(SampleDateTime)) %>%
+  #Remove erroneous sample date and time, skip for now
+  #filter(!is.na(SampleDateTime)) %>%
   #Remove single sample with NA count 
   filter(!is.na(Count)) %>%
-  #Ensure that data for salvage and loss are for a single fish
-  mutate(Salvage=Salvage/Count, Encounter=Encounter/Count, Entrain=Entrain/Count, Release=Release/Count, Loss=Loss/Count)
-
-
-#Multiply rows by nfish
-salvage_data_adjusted<- setDT(expandRows(salvage_data_adjusted, "Count")) 
-
-salvage_data_adjusted<- salvage_data_adjusted%>%
-  # build grouping by combination of variables
-  dplyr::group_by(SampleDateTime, Race, FL) %>%
-  # add row number which works per group due to prior grouping
-  dplyr::mutate(duplicateID = dplyr::row_number()) %>%
-  # ungroup to prevent unexpected behaviour down stream
-  dplyr::ungroup() 
+  #Remove adclip fish
+  filter(AdClip == FALSE) 
 
 #### Read Kevin Reece's Jan 5 2023 data
 
@@ -59,6 +50,10 @@ genetic_data_expanded<- genetic_data %>%
 genetic_data_expanded$SampleDate<- as.Date(genetic_data_expanded$'Sample Date')
 genetic_data_expanded$'Sample Date'<- NULL
 
+#There was a single 2001 fish with NA loss, set to 0
+genetic_data_expanded$Loss_KevinReece<-ifelse(is.na(genetic_data_expanded$Loss_KevinReece),0,genetic_data_expanded$Loss_KevinReece)
+
+
 str(genetic_data_expanded)
 
 ##################### Read JPE file
@@ -76,4 +71,4 @@ combined_data<-full_join(annual_salvage,annual_salvage_genetic) %>% left_join(jp
 
 
 #Print out csv
-write.csv(combined_data,file=file.path("output/Percent_JPE_draft_summary_2023-01-10.csv"),row.names = F)
+write.csv(combined_data,file=file.path("output/Percent_JPE_draft_summary_2023-01-11.csv"),row.names = F)
