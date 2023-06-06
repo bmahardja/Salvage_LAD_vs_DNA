@@ -88,3 +88,6 @@ salvage_genetic_SR_nfish_qaqc <- genetic_qaqc_data %>% filter(GeneticID=="Spring
 #Combine all the data into one
 salvage_SR_final_table <- salvage_SR_LAD %>% left_join(salvage_total_CHN) %>% left_join(salvage_genetic_sample) %>% 
   left_join(salvage_genetic_SR_nfish) %>% left_join(salvage_genetic_SR_loss_qaqc) %>% left_join(salvage_genetic_SR_nfish_qaqc)
+
+#Export data
+write.csv(salvage_SR_final_table,file=file.path("output/Spring_run_Salvage_SummaryTable_2023-06-06.csv"),row.names = F)
